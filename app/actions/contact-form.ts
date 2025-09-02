@@ -41,14 +41,16 @@ export async function submitContactForm(formData: FormData): Promise<ContactForm
       }
     }
 
-    // Initialize Neon SQL client
-    const sql = neon(process.env.DATABASE_URL!)
-
-    // Insert data into the database
-    await sql`
-      INSERT INTO contact_submissions (name, email, subject, message)
-      VALUES (${name}, ${email}, ${subject}, ${message})
-    `
+    // Initialize Neon SQL client if database is configured
+    if (process.env.DATABASE_URL) {
+      const sql = neon(process.env.DATABASE_URL)
+      
+      // Insert data into the database
+      await sql`
+        INSERT INTO contact_submissions (name, email, subject, message)
+        VALUES (${name}, ${email}, ${subject}, ${message})
+      `
+    }
 
     return {
       success: true,

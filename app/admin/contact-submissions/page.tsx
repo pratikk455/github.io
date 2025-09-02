@@ -12,7 +12,18 @@ type ContactSubmission = {
 
 export default async function ContactSubmissionsPage() {
   // Initialize Neon SQL client
-  const sql = neon(process.env.DATABASE_URL!)
+  if (!process.env.DATABASE_URL) {
+    return (
+      <div className="container mx-auto py-12 px-4">
+        <h1 className="text-3xl font-bold mb-8">Contact Form Submissions</h1>
+        <div className="bg-white p-6 rounded-xl border border-beige-200 shadow-lg text-center">
+          <p className="text-gray-600">Database not configured.</p>
+        </div>
+      </div>
+    )
+  }
+  
+  const sql = neon(process.env.DATABASE_URL)
 
   // Fetch submissions from the database
   const submissions = await sql<ContactSubmission[]>`

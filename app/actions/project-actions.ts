@@ -3,7 +3,7 @@
 import { neon } from "@neondatabase/serverless"
 import { revalidatePath } from "next/cache"
 
-const sql = neon(process.env.DATABASE_URL!)
+const sql = process.env.DATABASE_URL ? neon(process.env.DATABASE_URL) : null
 
 export type Project = {
   id: number
@@ -20,6 +20,9 @@ export type Project = {
 }
 
 export async function getProjects() {
+  if (!sql) {
+    return { projects: [], error: null }
+  }
   try {
     const projects = await sql<Project[]>`
       SELECT * FROM projects
@@ -33,6 +36,9 @@ export async function getProjects() {
 }
 
 export async function getFeaturedProjects() {
+  if (!sql) {
+    return { projects: [], error: null }
+  }
   try {
     const projects = await sql<Project[]>`
       SELECT * FROM projects
@@ -47,6 +53,9 @@ export async function getFeaturedProjects() {
 }
 
 export async function getProjectById(id: number) {
+  if (!sql) {
+    return { project: null, error: "Database not configured" }
+  }
   try {
     const [project] = await sql<Project[]>`
       SELECT * FROM projects
@@ -60,6 +69,9 @@ export async function getProjectById(id: number) {
 }
 
 export async function createProject(formData: FormData) {
+  if (!sql) {
+    return { success: false, error: "Database not configured" }
+  }
   try {
     const title = formData.get("title") as string
     const description = formData.get("description") as string
@@ -90,6 +102,9 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProject(id: number, formData: FormData) {
+  if (!sql) {
+    return { success: false, error: "Database not configured" }
+  }
   try {
     const title = formData.get("title") as string
     const description = formData.get("description") as string
@@ -125,6 +140,9 @@ export async function updateProject(id: number, formData: FormData) {
 }
 
 export async function deleteProject(id: number) {
+  if (!sql) {
+    return { success: false, error: "Database not configured" }
+  }
   try {
     await sql`
       DELETE FROM projects
